@@ -1,0 +1,15 @@
+{
+    "name": "dsl-platform/dsl-admin-php",
+    "description": " Administrative web interface for data based on the DSL model ",
+    "license": "BSD-3-Clause",
+    "type": "library",
+    "require": {
+        "silex/silex": "~1.1",
+        "silex/web-profiler": "~1.0",
+        "dsl-platform/dsl-symfony": "dev-master",
+        "dsl-platform/client": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "": "src/" }
+    }
+}

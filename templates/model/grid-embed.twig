@@ -1,0 +1,53 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+
+{% block breadcrumbs %}
+<div>
+    <a href="">/{{model}}</a>
+</div>
+{% endblock breadcrumbs %}
+
+{% block grid_button_add %}
+<div>
+    <a class="btn btn-default" href="/{{model}}/">Add new</a>
+</div>
+{% endblock grid_button_add %}
+
+{% block grid_bulk_actions %}
+<div class="pull-left hide">
+    <ul class="list-inline">
+        <li><button class="btn btn-warning btn-delete">Delete selected</button></li>
+    </ul>
+</div>
+{% endblock grid_bulk_actions %}
+
+{% block grid_table %}
+<table class="table table-striped">
+{% block grid_head %}
+    <thead></thead>
+        <tr>
+            <th></th>
+            {% embed [model~'/head.twig', 'gen/'~model~'/grid/head.twig'] %}
+            {% endembed %}
+            <th></th>
+        </tr>
+    </thead>
+{% endblock grid_head %}
+
+{% block grid_body %}
+    <tbody>
+        {% for item in items %}
+            <tr>
+                <td><input data-uri="{{item.URI}}" type="checkbox" /></td>
+            {% embed ['ui/'~model~'/grid/row.twig', 'gen/'~model~'/grid/row.twig'] %}
+            {% endembed %}
+                <td><a href="/{{model}}/{{item.URI}}">Edit</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+{% endblock grid_body %}
+</table>
+{% endblock grid_table %}
+
+{% endblock %}

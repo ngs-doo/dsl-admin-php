@@ -1,0 +1,18 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+<div class="row">
+    <div class="alert alert-danger">
+        Server error.
+    </div>
+</div>
+<div class="row alert">
+{{exception.message}}
+</div>
+{% if app.debug %}
+<div class="row">
+    {{exception.getTraceAsString}}
+</div>
+{% endif %}
+
+{% endblock %}

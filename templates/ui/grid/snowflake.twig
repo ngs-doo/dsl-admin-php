@@ -1,0 +1,45 @@
+{% extends 'layout.twig' %}
+
+{% import 'ui/buttons.twig' as buttons %}
+{% import 'ui/grid.twig' as grid %}
+
+{% block content %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li><a href="/{{ active_project }}">{{ active_project }}</a></li>
+        <li class="active"><a href="">{{model}}</a></li>
+    </ol>
+{% endblock breadcrumbs %}
+
+{% block grid_table %}
+<table class="table table-striped">
+{% block grid_head %}
+    <thead>
+        
+        <tr>
+            <th class="col-sm-1"></th>
+            {% block grid_head_fields %}{% endblock grid_head_fields %}
+        </tr>
+    </thead>
+{% endblock grid_head %}
+
+{% block grid_body %}
+    <tbody>
+        {% for item in items %}
+            {% block grid_body_row %}
+            <tr>
+                {% block grid_body_row_content %}
+                <td><input data-model="{{ model }}" data-uri="{{ item.URI }}" type="checkbox" /></td>
+                {% block grid_body_row_fields %}
+                {% endblock grid_body_row_fields %}
+                {% endblock grid_body_row_content %}
+            </tr>
+            {% endblock grid_body_row %}
+        {% endfor %}
+    </tbody>
+{% endblock grid_body %}
+</table>
+{% endblock grid_table %}
+
+{% endblock %}

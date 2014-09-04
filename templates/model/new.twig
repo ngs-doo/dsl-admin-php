@@ -1,0 +1,17 @@
+{% extends 'layout.twig' %}
+
+{% form_theme form 'form/fields.twig' %}
+
+{% block content %}
+
+{{ form_start(form, {attr: {'class': 'form-horizontal'}}) }}
+    {{ form_widget(form) }}
+{{ form_end(form) }}
+
+{% block modal %}
+<div class="grid-modal-container">
+{% embed 'model/modal.twig' %}{% endembed %}
+</div>
+{% endblock modal %}
+
+{% endblock content %}

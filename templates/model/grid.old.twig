@@ -1,0 +1,29 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<div>
+    <a class="btn btn-default" href="/{{model}}/">Add new</a>
+</div>
+
+<table class="table table-striped">
+{% block grid_head %}
+    <thead>
+        {% embed ['ui/'~model~'/grid/head.twig', 'gen/'~model~'/grid/head.twig'] %}
+        {% endembed %}
+        <th></th>
+    </thead>
+{% endblock %}
+
+{% block grid_body %}
+    <tbody>
+        {% for item in items %}
+            <tr>
+            {% embed ['ui/'~model~'/grid/row.twig', 'gen/'~model~'/grid/row.twig'] %}
+            {% endembed %}
+                <td><a href="/{{model}}/{{item.URI}}">Edit</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+{% endblock %}
+</table>
+{% endblock %}

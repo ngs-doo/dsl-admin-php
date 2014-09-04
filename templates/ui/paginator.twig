@@ -1,0 +1,35 @@
+<div class="pull-right">
+    <div>
+{% if items|length >= paginator.Count %}
+        <span>Total {{ paginator.Count }} result(s)</span>
+{% else %}
+        <span>Showing {{ (paginator.Page-1)*paginator.Limit+ 1}}-{{ (paginator.Page-1)*paginator.Limit + items|length }} of {{ paginator.Count }} result(s).
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  {{ paginator.Limit }}
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+{%              for option, link in perpage_links %}
+{%                if paginator.Limit == option %}
+                    <li class="disabled"><a href="#">{{ option }}</a></li>
+{%                  else %}
+                    <li><a href="{{ link }}">{{ option }}</a></li>
+{%                  endif %}
+{%              endfor %}
+                </ul>
+            </div> per page</span>
+{% endif %}
+    </div>
+    <div>
+        <ul class="pull-right pagination pagination-sm">
+        {% if paginator.Count > 0 %}
+            {% for page, link in page_links %}
+            <li {% if page == paginator.Page %}class="active"{% endif %}>
+                <a href="{{ link }}">{{ page }}</a>
+            </li>
+            {% endfor %}
+        {% endif %}
+        </ul>
+    </div>
+</div>

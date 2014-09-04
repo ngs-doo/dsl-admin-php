@@ -1,0 +1,205 @@
+{% block field_row %}
+{% spaceless %}
+    <div class="control-group {% if errors|length > 0 %}error{% endif %}" id="{{id}}_group">
+        <div class="form-group">
+            {{ form_label(form) }}
+            <div class="form-group">
+            {{ form_widget(form) }}
+            </div>
+            {{ form_errors(form) }}
+        </div>
+    </div>
+{% endspaceless %}
+{% endblock field_row %}
+
+{% block form_row %}
+{% spaceless %}
+    <div id="{{id}}_group" class="form-group">
+        {{ form_label(form, null, {'label': name, 'label_attr': {'class': 'col-sm-1'}}) }}
+        <div class="col-sm-11{% if errors|length > 0 %} has-warning{% endif %}">
+        {{ form_widget(form) }}
+        {{ form_errors(form) }}
+        </div>
+    </div>
+{% endspaceless %}
+{% endblock form_row %}
+
+{% block ngs_money_widget %}
+    {% spaceless %}
+    {% set type = type|default('text') %}
+    {% set attr = attr|merge({'class': 'input-small' }) %}
+    <input type="text" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    {% endspaceless %}
+{% endblock %}
+
+{% block ngs_localdate_widget %}
+    {% spaceless %}
+    {% set attr = attr|merge({'class': 'has-datepicker form-control' }) %}
+    <input type="text" {{ block('widget_attributes') }} value="{{ value }}" data-date-format="{{ date_format }}">
+    {% endspaceless %}
+{% endblock %}
+
+{% block ngs_timestamp_widget %}
+    {% spaceless %}
+        {% set attr = attr|merge({'class': 'has-datetimepicker form-control' }) %}
+        <input type="text" {{ block('widget_attributes') }} value="{{ value }}">
+    {% endspaceless %}
+{% endblock %}
+
+{% block percent_widget %}
+    {% spaceless %}
+    {% set type = type|default('text') %}
+    {% set attr = attr|merge({'class': 'input-small' }) %}
+    <div class="input-prepend">
+        <span class="add-on">%</span>
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    </div>
+    {% endspaceless %}
+{% endblock %}
+
+{% block form_widget_compound %}
+{% spaceless %}
+<!-- @todo indent .form-compound -->
+    <div class="form-compound" {{ block('widget_container_attributes') }}>
+        {% if form.parent is empty %}
+            {{ form_errors(form) }}
+        {% endif %}
+        {{ block('form_rows') }}
+        {{ form_rest(form) }}
+    </div>
+{% endspaceless %}
+{% endblock form_widget_compound %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+            <ul class="form-errors list-unstyled alert alert-warning">
+                {% for error in errors %}
+                    <li>{{
+                    error.messagePluralization is null
+                    ? error.messageTemplate|trans(error.messageParameters, 'validators')
+                    : error.messageTemplate|transchoice(error.messagePluralization, error.messageParameters, 'validators')
+                    }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block ngs_lookup_widget %}
+
+{% if _lookup_index is not defined %}
+{% set _lookup_index=1 %}
+{% else %}
+{% set _lookup_index = 2 %}
+{% endif %}
+    {% spaceless %}
+    <div class="input-group">
+        <span class="input-group-btn">
+            <a href="{{ path('ui_grid', {'model': model}) }}" class="btn btn-default grid-lookup" data-modal="#grid-modal" data-lookup-uri="#{{ id }}"><span class="glyphicon glyphicon-search" ></span></a>
+        </span>
+    {% set attr = attr|merge({'class': 'form-control lookup-control' }) %}
+    {% if type1 == "textarea" %}
+        <textarea {{ block('widget_attributes') }}>{{ value | default ('') }}</textarea>
+    {% else %}
+        <input type="{{ type1 }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    {% endif %}
+
+    {% set attributes = block ('widget_attributes') | replace ({ ' name="': ' data-name="', 'id="': 'data-id="'}) %}
+    {% if type2 == "textarea" %}
+        <textarea readonly="readonly" {{ attributes | raw }} id="{{ id }}-display">{{ display_value | default (value) | default ('') }}</textarea>
+    {% else %}
+        <input readonly="readonly" type="{{ type2 }}" id="{{ id }}-display" {{ attributes | raw }} {% if display_value is not empty %}value="{{ display_value }}" {% endif %}/>
+    {% endif %}
+
+        <!--a href="{{ path('ui_grid', {'model': model}) }}" class="btn btn-sm btn-default grid-lookup" data-toggle="modal" data-target="#grid-modal" lookup-options="" lookup-target="#{{ id }}" lookup-display="{{ display }}" lookup-display-target="#{{ id }}-display" lookup-modal="{{ modalContainer }}" id="{{ id }}-show-grid"><span class="glyphicon glyphicon-search" ></span></a-->
+    </div>
+    {% endspaceless %}
+{% endblock %}
+
+{% block ngs_collection_row %}
+    {% if html is defined %}
+        {% set proto_str = html %}
+    {% else %}
+        {% set proto_str = form_widget (prototype) %}
+    {% endif %}
+
+    <div class="" data-prototype="{{ proto_str | e }}{{ block('button_remove')|e }}" data-prototype-name="{{ prototype.vars.name }}" data-prototype-fullname="{{ prototype.vars.full_name }}" data-name="{{ name }}">
+        <label>{{ name | title }}</label> <a class="btn btn-default btn-sm add"><span class="glyphicon glyphicon-plus"></span></a>
+        <ul class="list-unstyled collection-list list-{{ name }}">
+            {% for f in form %}
+            <li>
+                {% if f.vars.html is defined %}
+                    {{ f.vars.html }}
+                {% else %}
+                    {{ form_widget(f) }}
+                    {{ form_errors(f) }}
+                {% endif %}
+                {{ block('button_remove') }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>   
+{% endblock %}
+    
+{% block button_remove %}
+<a data-toggle="tooltip" data-title="Remove item" data-placement="bottom" class="btn btn-default button-remove"><span class="glyphicon glyphicon-trash"></span></a>
+{% endblock %}
+    
+{% block collection_widget %}
+{% spaceless %}
+    {% if prototype is defined %}
+    {% set attr = attr|merge({'class': 'list-unstyled form-collection' }) %}
+    <ul {{ block('widget_container_attributes') }} data-prototype="{{ block('button_remove')|e }}{{ form_widget(form.vars.prototype)|e }}">
+        {{ block('collection_rows') }}
+        {{ form_rest(form) }}
+    </ul>
+    {% else %}
+        {{ block('form_widget') }}
+    {% endif %}
+{% endspaceless %}
+{% endblock collection_widget %}
+
+{% block collection_rows %}
+{% spaceless %}
+    {{ form_errors(form) }}
+    {% for child in form %}
+    <li>
+        {{ block('button_remove') }}
+        <div>
+        {{ form_row(child, {'attr':{'class':'collection-item'}}) }}
+        </div>
+    </li>
+    {% endfor %}
+{% endspaceless %}
+{% endblock collection_rows %}
+
+{% block form_widget_simple %}
+{% spaceless %}
+    {% set attr = {class: 'form-control'} %}
+    {% set type = type|default('text') %}
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+{% endspaceless %}
+{% endblock form_widget_simple %}
+
+{% block submit_widget %}
+{% spaceless %}
+    {% set type = type|default('submit') %}
+    {% set attr = attr|merge({class: 'btn btn-primary', 'data-loading-text': 'Saving...'}) %}
+    {% set inner = '<span class="glyphicon glyphicon-floppy-disk"></span> ' %}
+    {{ block('button_widget') }}
+{% endspaceless %}    
+{% endblock submit_widget %}
+    
+{% block button_widget %}
+{% spaceless %}
+    {% if label is empty %}
+        {% set label = name %}
+    {% endif %}
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ inner is defined ? inner|raw : '' }}{{ label|trans({}, translation_domain) }}</button>
+{% endspaceless %}
+{% endblock button_widget %}
+
+{% block ngs_collection_detail %}
+
+{% endblock %}

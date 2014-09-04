@@ -1,0 +1,29 @@
+{% macro header(field, model, order) %}
+{% set order_dir = order.field == field and order.dir==true ? 'desc' : 'asc' %}
+<a href="{{ path('ui_grid', {'model': model, 'order': field, 'order_dir': order_dir}) }}">
+    <span>{{ field }}</span>
+    <span {% if order.field == field %}class="glyphicon glyphicon-sort-by-attributes{{ order_dir=='asc' ? '-alt' : '' }}"{% endif %}></span> 
+</a>
+{% endmacro %}
+
+{% macro td_detail_collection(model, uri, field) %}
+<td><a class="grid-detail" data-detail="true" data-entity="" href="{{ path('ui_model_detail', {'model': model, 'uri': uri, 'field': field}) }}">{{ field }} <span class="badge">{{ item.Orders|length }}</span></a></td>
+{% endmacro %}
+
+{% macro simple_collection(items) %}
+<ul class="list-unstyled">
+{% for item in items %}
+    <li>{{ item }}</li>
+{% endfor %}
+</ul>
+{% endmacro %}
+
+{% macro root_collection(uris, model) %}
+<ul class="list-unstyled">
+{% for uri in uris %}
+    <li><a href="{{ path('ui_model_edit', { 'model': model, 'uri': uri }) }}">{{ uri }}</a></li>
+{% endfor %}
+</ul>
+{% endmacro %}
+
+<a class="" data-entity="" href="{{ path('ui_model_edit', { model:'Loan.Application', uri: item.URI }) }}#Offers">Offers <span class="badge">

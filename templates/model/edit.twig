@@ -1,0 +1,26 @@
+{% extends 'layout.twig' %}
+{% import 'ui/buttons.twig' as buttons %}
+
+{% form_theme form 'form/fields.twig' %}
+
+{% block content %}
+
+{% block breadcrumbs %}
+<div>
+    &gt; <a href="{{ path('ui_grid', {'model': model}) }}">{{model}}</a>
+    &gt; <a href="{{ path('ui_model_edit', {'model': model, 'uri': item.URI} ) }}">{{item.URI}}</a>
+</div>
+{% endblock breadcrumbs %}
+
+{{ form_start(form, {attr: {'class': 'form-horizontal'}}) }}
+    {{ form_widget(form) }}
+{{ form_end(form) }}
+{{ buttons.button_delete(model, item.URI) }}
+
+{% block modal %}
+<div class="grid-modal-container">
+{% embed 'model/modal.twig' %}{% endembed %}
+</div>
+{% endblock modal %}
+
+{% endblock %}

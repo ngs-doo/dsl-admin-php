@@ -1,0 +1,10 @@
+{% macro button_edit(model, uri) %}
+<a class="btn btn-default btn-sm" href="{{ path('ui_model_edit', {'model': model, 'uri': uri}) }}"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+{% endmacro %}
+
+{% macro button_delete(model, uri) %}
+<form class="form-delete" action="{{ path('ui_model_delete', {'model': model, 'uri': uri }) }}" method="post">
+    <input type="hidden" name="_method" value="delete">
+    <button class="btn btn-default btn-sm btn-delete"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+</form>
+{% endmacro %}

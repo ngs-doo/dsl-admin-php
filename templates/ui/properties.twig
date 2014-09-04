@@ -1,0 +1,13 @@
+{% macro value_null() %}
+
+{% endmacro %}
+
+{% macro bool(value) %}
+    {% if value is null %}
+        <span class="value-null"></span>
+    {% elseif value %}
+        <span class="glyphicon glyphicon-ok"></span>
+    {% else %}
+        <span class="glyphicon glyphicon-remove"></span>
+    {% endif %}
+{% endmacro %}

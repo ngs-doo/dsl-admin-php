@@ -1,0 +1,21 @@
+<div class="row">
+    <div class="col-lg-12">
+        <ul class="nav nav-pills">
+            {% embed 'gen/navig.twig' %}{% endembed %}
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-10 col-lg-offset-1">
+{% block messages %}
+        <div class="row">
+            <ul class="col-lg-10 col-lg-offset-1 col-sm-10 col-sm-offset-1 messages list-unstyled">
+{%              for msg in app.session.getFlashBag.get('message') %}
+                <li class="alert alert-{{ msg.type }}">{{ msg.content }}</li>
+{%              endfor %}
+            </ul>
+        </div>
+{% endblock messages %}
+        {% block content %}{% endblock %}
+    </div>
+</div>

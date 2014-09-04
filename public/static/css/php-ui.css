@@ -1,0 +1,53 @@
+.grid-buttons>* {
+    display: inline-block;
+}
+
+.form-delete {
+    margin: 0;
+    padding: 0;
+}
+
+.cook-book .recipes .notes label {
+    display: none;
+}
+/*
+#grid-modal .modal-dialog {
+    width: 90%;
+}
+*/
+.collection-list>li {
+    padding-left: 40px;
+    border: 1px transparent solid;
+}
+
+.collection-list input {
+    width: 90%;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.collection-list .button-remove {
+    display: inline;
+}
+
+.collection-list>li:hover {
+    border: 1px #f7f7f7 solid;
+    background-color: #f7f7f7;
+}
+
+.form-errors {
+    padding: 5px;
+}
+
+.messages li {
+    padding: 5px;
+}
+
+#grid-modal tr {
+    cursor: pointer;
+}
+
+#grid-modal tr:hover td {
+    background-color: #DFF0D8;
+}
+
