@@ -6,7 +6,7 @@ use Composer\Script\Event;
 
 class Installer
 {
-    private static $clcUrl = 'https://github.com/ngs-doo/dsl-compiler-client/releases/download/0.9.6/dsl-clc.jar';
+    private static $clcUrl = 'https://github.com/ngs-doo/dsl-compiler-client/releases/download/0.9.7/dsl-clc.jar';
 
     protected static function error($message)
     {
