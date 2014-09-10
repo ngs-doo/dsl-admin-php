@@ -36,7 +36,32 @@ $app['form.extensions'] = $app->share($app->extend('form.extensions', function (
 }));
 
 $app['twig.path'] = array(
+    __DIR__.'/../templates',
     __DIR__.'/../Generated-PHP-UI',
     __DIR__.'/../vendor/dsl-platform/dsl-admin-php/templates',
 );
+$app['twig.loader.filesystem'] = $app->share(function ($app) {
+    $fs = new \Twig_Loader_Filesystem($app['twig.path']);
+    // @todo namespaced twig paths
+    // $fs->addPath(__DIR__.'/../vendor/dsl-platform/dsl-admin-php/templates', 'dsl_admin');
+    return $fs;
+});
 $app['twig.options'] = array('cache' => __DIR__.'/../var/cache/twig');
+
+\Symfony\Component\HttpFoundation\Request::enableHttpMethodParameterOverride();
+
+$app['crud.controller'] = $app->share(function() use ($app) {
+    $controller = new \PhpDslAdmin\CrudController($app);
+    $controller->setTwigNamespace('');
+    return $controller;
+});
+$crudProvider = new \PhpDslAdmin\CrudControllerProvider();
+$routes = $crudProvider->connect($app);
+$app->mount('/crud', $routes);
+
+$app->get('/', function() use ($app) {
+    return $app['twig']->render('index.twig');
+});
+$app->get('/crud', function() use ($app) {
+    return $app['twig']->render('index.twig');
+});
