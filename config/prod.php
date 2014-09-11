@@ -40,6 +40,7 @@ $app['twig.path'] = array(
     __DIR__.'/../Generated-PHP-UI',
     __DIR__.'/../vendor/dsl-platform/dsl-admin-php/templates',
 );
+
 $app['twig.loader.filesystem'] = $app->share(function ($app) {
     $fs = new \Twig_Loader_Filesystem($app['twig.path']);
     // @todo namespaced twig paths

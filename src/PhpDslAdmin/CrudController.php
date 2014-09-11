@@ -38,10 +38,9 @@ class CrudController // implements \Silex\ControllerProviderInterface
 
             try {
                 $crudProxy->create($item);
-                $app['message']->info('Created object "' . $model . '" with URI "' . $item->URI . '"');
                 return $app->redirect($this->path('ui_grid', array('model' => $model)));
             } catch (InvalidRequestException $e) {
-                $app['message']->error($e->getMessage());
+                throw $e;
             }
         }
 
@@ -64,17 +63,15 @@ class CrudController // implements \Silex\ControllerProviderInterface
             $form->handleRequest($app['request']);
         }
         catch (InvalidArgumentException $ex) {
-            $app['message']->warn($ex->getMessage());
             $app['logger']->warn($form->getErrorsAsString());
+            throw $ex;
         }
         if ($form->isValid()) {
             $item = $form->getData();
             $crudProxy->update($item);
-            $app['message']->info('Updated object "'.$model.'" with URI "'.$item->URI.'"');
             return $app->redirect($this->path('ui_grid', array('model' => $model)));
         }
         $app['logger']->warn($form->getErrorsAsString());
-        $app['message']->warn('Submitted data was invalid');
         return $app['twig']->render('model/new.twig', array('form' => $form->createView()));
     }
 
@@ -131,11 +128,11 @@ class CrudController // implements \Silex\ControllerProviderInterface
 
         $items = $proxy->search($class, $limit, $paginator->getOffset(), $order);
 
-        $template = $app['request']->isXmlHttpRequest()
-            ? $model . '/grid_lookup.twig'
-            : $model . '/grid.twig';
-
-        return $app['twig']->render($model . '/grid.twig', [
+    /*    $template = $app['request']->isXmlHttpRequest()
+            ? str_replace('.', '/', $model) . '/grid_lookup.twig'
+            : str_replace('.', '/', $model) . '/grid.twig';
+*/
+        return $app['twig']->render(str_replace('.', '/', $model) . '/grid.twig', [
             //return $app['twig']->render('ui/grid/aggregate.twig', [
             'order' => ['field' => $orderField, 'dir' => $orderDir],
             'items' => $items,
@@ -201,9 +198,8 @@ class CrudController // implements \Silex\ControllerProviderInterface
         $item = $crudProxy->read($modelClass, $uri);
         try {
             $crudProxy->delete($modelClass, $item->URI);
-            $app['message']->info('Record "' . $model . '" with URI "' . $uri . '" removed');
         } catch (Exception $ex) {
-            $app['message']->warn(sprintf('Cannot delete object "%s" with URI %s: %s', $model, $uri, $ex->getMessage()));
+            throw $ex;
         }
         return $app->redirect($this->path('ui_grid', array('model' => $model)));
     }
@@ -221,7 +217,7 @@ class CrudController // implements \Silex\ControllerProviderInterface
             //$app['message']->info('Deleted '.count($items).' "'.$model.'" object(s)');
             return $app->json($uris);
         } catch (Exception $ex) {
-            $app['message']->warn(sprintf('Could not bulk delete objects "%s": %s', $model, $ex->getMessage()));
+            // throw $ex;
             return $app->json($uris, 403);
         }
         return $app->json($uris);
