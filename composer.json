@@ -10,6 +10,9 @@
         "dsl-platform/client": "dev-master"
     },
     "autoload": {
-        "psr-0": { "": "src/" }
+        "psr-4": { "": "src/" }
+    },
+    "require-dev": {
+        "composer/composer": "~1.0.0"
     }
 }

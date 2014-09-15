@@ -8,7 +8,7 @@ use NGS\Client\StandardProxy;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
-class CrudController // implements \Silex\ControllerProviderInterface
+class CrudController
 {
     private $app;
 
