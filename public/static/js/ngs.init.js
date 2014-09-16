@@ -86,7 +86,6 @@ $(function() {
         $('.grid-control-bulk').each(function() {
             var $this = $(this);
             var toggleControl = function() {
-                //console.info('toggle')
                 $this.toggle(grid.findSelected().length > 0);
             }
             grid.on('grid.row.select grid.row.deselect grid.row.delete', toggleControl);
@@ -143,7 +142,6 @@ $(function() {
         
         jQuery.get($(this).attr('href'))
             .done(function(res) {
-                console.log($modal);
                 $modal.find('.modal-body').html(res).show();
                 $modal.find('.modal-loading').hide();
             })

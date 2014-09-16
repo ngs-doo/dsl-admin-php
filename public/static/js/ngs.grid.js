@@ -1,11 +1,9 @@
 if (typeof NGS == 'undefined') var NGS = { };
 
 NGS.modal = function (parent) {
-    console.warn('modal')
     var e = $('<div tabIndex="-1" class="modal fade" role="dialog" aria-hidden="true">').appendTo ('body');
 //    var e = $('.grid-modal-container>.modal');
-    console.warn(e);
-    
+
     $.extend (e, NGS.modal.prototype);
 
     if (parent)
@@ -125,8 +123,6 @@ NGS.grid = function (element) {
     this.modalContainer = this.element.attr ('lookup-modal') || 'body';
     this.url = this.element.attr('href');
     
-   //  console.warn(this.modalContainer);
-
     if (this.modalContainer == 'body' || $(this.modalContainer).length == 0) {
         this.modal = new NGS.modal ();
         this.addModal = new NGS.modal (this.modal);
@@ -143,8 +139,6 @@ NGS.grid = function (element) {
     
     if (self.modal.empty()) {
         $.get (self.url, function (response) {
-            console.warn(self.modal);
-            console.warn(self.modal.find('.modal-body'));
             self.modal.find('.modal-body').html (response);
             self.init();
             self.modal.on ('click', 'tr', function () {
@@ -221,8 +215,6 @@ NGS.grid.prototype.ajaxEdit = function () {
             event.preventDefault();
             var $this = $(this);
             var url = $this.attr('href');
-            
-            console.log('ajaxedit');
             
             $.get(
                 url,

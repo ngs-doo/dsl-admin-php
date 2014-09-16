@@ -128,13 +128,9 @@ class CrudController
 
         $items = $proxy->search($class, $limit, $paginator->getOffset(), $order);
 
-    /*    $template = $app['request']->isXmlHttpRequest()
-            ? str_replace('.', '/', $model) . '/grid_lookup.twig'
-            : str_replace('.', '/', $model) . '/grid.twig';
-*/
         return $app['twig']->render(str_replace('.', '/', $model) . '/grid.twig', [
-            //return $app['twig']->render('ui/grid/aggregate.twig', [
             'order' => ['field' => $orderField, 'dir' => $orderDir],
+            '_is_ajax_request' => $app['request']->isXmlHttpRequest(),
             'items' => $items,
             'model' => $model,
             'count' => $count,

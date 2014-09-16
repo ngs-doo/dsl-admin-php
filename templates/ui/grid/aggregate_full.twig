@@ -8,15 +8,6 @@
 
 {% block content %}
 
-{% block breadcrumbs %}
-{% if active_project is defined %}
-<ol class="breadcrumb">
-    <li><a href="/{{ active_project }}">{{ active_project }}</a></li>
-    <li class="active"><a href="">{{model}}</a></li>
-</ol>
-{% endif %}
-{% endblock breadcrumbs %}
-
 {% block grid_control %}
 <ul class="grid-control list-unstyled list-inline" data-grid="#{{ gridId }}">
 {%  block grid_button_add %}

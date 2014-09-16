@@ -35,7 +35,7 @@
 {% block ngs_localdate_widget %}
     {% spaceless %}
     {% set attr = attr|merge({'class': 'has-datepicker form-control' }) %}
-    <input type="text" {{ block('widget_attributes') }} value="{{ value }}" data-date-format="{{ date_format }}">
+    <input type="text" {{ block('widget_attributes') }} value="{{ value }}" {% if date_format is defined %}data-date-format="{{ date_format }}{% endif %}">
     {% endspaceless %}
 {% endblock %}
 
