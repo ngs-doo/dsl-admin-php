@@ -1,27 +1,22 @@
 <?php
 namespace PhpDslAdmin\Install;
 
+use Composer\Compiler;
 use Composer\IO\IOInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 class RevenjInstaller
 {
-    protected $config;
+    protected $context;
 
-    protected $io;
-
-    protected $compiler;
-
-    public function __construct(IOWrapper $io, Config $config, CompilerClient $compiler)
+    public function __construct(Context $context)
     {
-        $this->io = $io;
-        $this->config = $config;
-        $this->compiler = $compiler;
+        $this->context = $context;
     }
 
     public function getConfigPath()
     {
-        return $this->config->get(Config::REVENJ_PATH).'/Revenj.Http.exe.config';
+        return $this->context->get(Config::REVENJ_PATH).'/Revenj.Http.exe.config';
     }
 
     public function getConfigContents()
@@ -44,44 +39,31 @@ class RevenjInstaller
     public function setup()
     {
         if (!file_exists($this->getConfigPath())) {
-            $this->io->write('Downloading Revenj to folder: '.$this->config->get(Config::REVENJ_PATH));
-            $this->compiler->downloadRevenj();
+            $this->context->write('Downloading Revenj to folder: '.$this->context->get(Config::REVENJ_PATH));
+            $compiler = new CompilerClient($this->context);
+            $compiler->downloadRevenj();
         }
-        $address = $this->config->get(Config::REVENJ_URL);
-        if (substr($address, strlen($address)-1) !== '/')
-            $address .= '/';
-        $this->address = $address;
-    }
-
-    public function setupConfig()
-    {
-        $connString = $this->config->getConnectionString();
-        $url = $this->config->get(Config::REVENJ_URL);
-
+        $url = $this->context->get(Config::REVENJ_URL);
+        if (substr($url, strlen($url)-1) !== '/')
+            $url .= '/';
+        $db = $this->context->getDb();
+        $connString = addslashes(sprintf('server=%s;port=%s;database=%s;user=%s;password=%s;encoding=unicode',
+            $db['server'], $db['port'], $db['database'], $db['user'], $db['password']));
         $content = $this->getConfigContents();
+
+        $addressId = preg_replace("/[^A-Za-z0-9]/", '', $url);
+        $content = preg_replace(
+            '/key="HttpAddress_(.*)" value="(.*)"/',
+            'key="HttpAddress_' . $addressId . '" value="' . $url . '"',
+            $content);
         $content = preg_replace(
             '/key="ServerAssembly" value="(.*)"/',
             'key="ServerAssembly" value="../GeneratedModel.dll"',
             $content);
-
-        if ($connString !== null)
-            $content = preg_replace(
-                '/key="ConnectionString" value="(.*)"/',
-                'key="ConnectionString" value="' . $connString . '"',
-                $content);
-
-        if ($url !== null) {
-            $addressId = preg_replace("/[^A-Za-z0-9]/", '', $url);
-            $content = preg_replace(
-                '/key="HttpAddress_(.*)" value="(.*)"/',
-                'key="HttpAddress_' . $addressId . '" value="' . $url . '"',
-                $content);
-        }
-        return $this->saveConfig($content);
-    }
-
-    public function run()
-    {
-
+        $content = preg_replace(
+            '/key="ConnectionString" value="(.*)"/',
+            'key="ConnectionString" value="' . $connString . '"',
+            $content);
+        $this->saveConfig($content);
     }
 }

@@ -3,107 +3,87 @@ namespace PhpDslAdmin\Install;
 
 class Config
 {
-    const DSL_USERNAME = 'u';
-    const DSL_PASSWORD = 'p';
-    const DSL_PATH = 'dsl_dir';
-
-    const DB_DATABASE = 'db_database';
-    const DB_USERNAME = 'db_username';
-    const DB_PASSWORD = 'db_password';
-    const DB_HOST = 'db_host';
-    const DB_PORT = 'db_port';
-
-    const REVENJ_URL = 'revenj_url';
-    const REVENJ_PATH = 'revenj_dir';
-
-    const PHP_URL = 'php_url';
-
-    private $io;
-
-    private $values = array();
+    const DSL_USERNAME  = 'DSL_USERNAME';
+    const DSL_PASSWORD  = 'DSL_PASSWORD';
+    const DSL_PATH      = 'DSL_PATH';
+    const DB_DATABASE   = 'DB_DATABASE';
+    const DB_USER       = 'DB_USER';
+    const DB_PASSWORD   = 'DB_PASSWORD';
+    const DB_SERVER     = 'DB_SERVER';
+    const DB_PORT       = 'DB_PORT';
+    const REVENJ_URL    = 'REVENJ_URL';
+    const REVENJ_PATH   = 'REVENJ_PATH';
+    const PHP_URL       = 'PHP_URL';
+    const CLC_PATH      = 'CLC_PATH';
+    const CLC_URL       = 'CLC_URL';
 
     private static $descriptions = array(
         self::DSL_USERNAME => 'DSL Platform username',
         self::DSL_PASSWORD => 'DSL Platform password',
-        self::DSL_PATH => 'DSL folder',
+        self::DSL_PATH => 'Path to DSL folder',
         self::DB_DATABASE => 'Database name',
-        self::DB_USERNAME => 'Database user',
+        self::DB_USER => 'Database user',
         self::DB_PASSWORD => 'Database password',
-        self::DB_HOST => 'Database host',
+        self::DB_SERVER => 'Database server',
         self::DB_PORT => 'Database port',
         self::REVENJ_URL => 'Revenj URL',
-        self::REVENJ_PATH => './revenj',
+        self::REVENJ_PATH => 'Path to Revenj folder',
         self::PHP_URL => 'PHP Admin URL',
+        self::CLC_PATH => 'Path to dsl-clc.jar',
+        self::CLC_URL => 'dsl-clc.jar download URL',
     );
 
-    public function __construct(IOWrapper $io, array $values = array())
+    private $values = array();
+
+
+    public function __construct(array $params)
     {
-        $this->io = $io;
-        foreach ($values as $key => $val)
+        foreach ($params as $key => $val)
             $this->set($key, $val);
     }
 
-    public function get($key)
+    public static function readFile($path)
     {
-        //if (!defined('Config::'.$key))
-        //    throw new \InvalidArgumentException('Cannot get config value! Invalid config property: '.$key);
-        if (!isset($this->values[$key])) {
-            $value = $this->io->askRequired(self::$descriptions[$key]);
-            $this->values[$key] = $value;
-        }
-        return $this->values[$key];
+        if (!file_exists($path))
+            throw new \ErrorException('File not found: '.$path);
+        $content = file_get_contents($path);
+        if ($content === false)
+            throw new \ErrorException('Could not read from config file: '.$path);
+        $params = json_decode($content, true);
+        if ($params === null)
+            throw new \ErrorException('Could not parse dsl_config.json file! Check if it contains valid JSON.');
+        return $params;
     }
 
-    public function getUsername()
+    public function writeFile($path)
     {
-        return $this->get(static::DSL_USERNAME);
+        $params = array();
+        foreach ($this->values as $key => $val)
+            $params[strtolower($key)] = $val;
+        ksort($params);
+        $content = json_encode($params, JSON_FORCE_OBJECT|JSON_PRETTY_PRINT);
+        $content = file_put_contents($path, $content);
+        if ($content === false)
+            throw new \ErrorException('Could not write to config file: '.$path);
     }
 
-    public function getPassword()
-    {
-        if (!isset($this->values[static::DSL_PASSWORD])) {
-            $value = $this->io->askRequired(self::$descriptions[static::DSL_PASSWORD], null, true);
-            $this->values[static::DSL_PASSWORD] = $value;
-        }
-        return $this->values[static::DSL_PASSWORD];
-    }
-/*
     public function get($key)
     {
-        if (!defined(Config::$key))
+        if (!defined('static::'.$key))
             throw new \InvalidArgumentException('Cannot get config value! Invalid config property: '.$key);
-        return $this->values[$key];
+        return isset($this->values[$key]) ? $this->values[$key] : null;
     }
-*/
+
     public function set($key, $value)
     {
-        //if (!isset(static::$key))
-        //    throw new \InvalidArgumentException('Cannot set config value! Invalid config property: '.$key);
+        $key = strtoupper($key);
+        if (!defined('static::'.$key))
+            throw new \InvalidArgumentException('Cannot set config value! Invalid config property: '.$key);
         $this->values[$key] = $value;
     }
 
-    public function getDslPath()
+    public function getDescription($key)
     {
-        return getcwd().'/dsl';
-    }
-
-    protected function formatConnectionString($string)
-    {
-        return addslashes(sprintf($string,
-            $this->get(Config::DB_HOST),
-            $this->get(Config::DB_PORT),
-            $this->get(Config::DB_DATABASE),
-            $this->get(Config::DB_USERNAME),
-            $this->get(Config::DB_PASSWORD)));
-    }
-
-    public function getCompilerConnectionString()
-    {
-        return $this->formatConnectionString('%s:%s/%s?user=%s&password=%s');
-    }
-
-    public function getConnectionString()
-    {
-        return $this->formatConnectionString('server=%s;port=%s;database=%s;user=%s;password=%s;encoding=unicode');
+        return isset(self::$descriptions[$key]) ? self::$descriptions[$key] : null;
     }
 }
