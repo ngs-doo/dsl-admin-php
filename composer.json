@@ -1,5 +1,5 @@
 {
-    "name": "dsl-platform/dsl-admin-php",
+    "name": "dsl-platform/admin",
     "description": " Administrative web interface for data based on the DSL model ",
     "license": "BSD-3-Clause",
     "type": "library",
