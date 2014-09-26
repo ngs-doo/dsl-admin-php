@@ -22,20 +22,28 @@ class CrudController
         return $this->app['url_generator']->generate($route, $parameters, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
+    protected function createFormBuilder($model)
+    {
+        $formName = str_replace('.', '_', $model);
+        return $this->app['form.factory']->createBuilder(
+            $formName,
+            null,
+            array('dsl_client' => $this->app['dsl.client'])
+        );
+    }
+
     public function createAction($model)
     {
         $app = $this->app;
-        $formName = str_replace('.', '_', $model);
-        $form = $app['form.factory']->createBuilder($formName)
+
+        $form = $this->createFormBuilder($model)
             ->setAction($app['request']->getUri())
             ->getForm();
-
         $form->handleRequest($app['request']);
 
         if ($form->isValid()) {
             $item = $form->getData();
             $crudProxy = new CrudProxy($app['dsl.client']);
-
             try {
                 $crudProxy->create($item);
                 return $app->redirect($this->path('ui_grid', array('model' => $model)));
@@ -52,8 +60,8 @@ class CrudController
         $app = $this->app;
         $modelClass = $app['dsl']->resolveClass($model);
         $crudProxy = new CrudProxy($app['dsl.client']);
-        $formName = str_replace('.', '_', $model);
-        $form = $app['form.factory']->createBuilder($formName)
+
+        $form = $this->createFormBuilder($model)
             ->setMethod('PUT')
             ->setAction($app['request']->getUri())
             ->getForm();
@@ -143,8 +151,7 @@ class CrudController
     public function addAction($model)
     {
         $app = $this->app;
-        $formName = str_replace('.', '_', $model);
-        $form = $app['form.factory']->createBuilder($formName)
+        $form = $this->createFormBuilder($model)
             ->setMethod('POST')
             ->setAction($this->path('ui_model_create', array('model' => $model)))
             ->getForm();
@@ -162,20 +169,13 @@ class CrudController
     public function editAction($model, $uri)
     {
         $app = $this->app;
-
-        $formName = str_replace('.', '_', $model);
-        $crudProxy = new CrudProxy($app['dsl.client']);
-
-        $formBuilder = $app['form.factory']->createBuilder($formName)
-            ->setAction('/' . $model . '/' . $uri)
-            ->setMethod($uri === null ? 'POST' : 'PUT');
-
-        $form = $formBuilder
-            ->setAction($this->path('ui_model_update',
-                array('model' => $model, 'uri' => $uri)))
+        $form = $this->createFormBuilder($model)
+            ->setMethod($uri === null ? 'POST' : 'PUT')
+            ->setAction($this->path('ui_model_update', array('model' => $model, 'uri' => $uri)))
             ->getForm();
 
         $modelClass = $app['dsl']->resolveClass($model);
+        $crudProxy = new CrudProxy($app['dsl.client']);
         $item = $crudProxy->read($modelClass, $uri);
         $form->setData($item);
 

@@ -62,9 +62,10 @@
                 </ul>
             </div>
 {% endblock messages %}
-            {% block content %}{% endblock %}
+{% block content %}{% endblock %}
         </div>
 
+{% block modal %}
         <div id="mod" class="modal fade" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -73,5 +74,6 @@
             </div>
         </div>
     </div>
+{% endblock modal %}
 </body>
 </html>
