@@ -3,15 +3,15 @@
 {% if items|length >= paginator.Count %}
         <span>Total {{ paginator.Count }} result(s)</span>
 {% else %}
-        <span>Showing {{ (paginator.Page-1)*paginator.Limit+ 1}}-{{ (paginator.Page-1)*paginator.Limit + items|length }} of {{ paginator.Count }} result(s).
+        <span>Showing {{ (paginator.Page-1)*paginator.PerPage+ 1}}-{{ (paginator.Page-1)*paginator.PerPage + items|length }} of {{ paginator.Count }} result(s).
             <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  {{ paginator.Limit }}
+                  {{ paginator.PerPage }}
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
 {%              for option, link in perpage_links %}
-{%                if paginator.Limit == option %}
+{%                if paginator.PerPage == option %}
                     <li class="disabled"><a href="#">{{ option }}</a></li>
 {%                  else %}
                     <li><a href="{{ link }}">{{ option }}</a></li>

@@ -143,6 +143,8 @@ class CrudController
             'model' => $model,
             'count' => $count,
             'paginator' => $paginator,
+            'page' => $paginator->getPage(),
+            'limit' => $paginator->getPerPage(),
             'page_links' => $pageLinks,
             'perpage_links' => $perpageLinks,
         ]);
