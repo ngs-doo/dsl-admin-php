@@ -203,3 +203,8 @@
 {% block ngs_collection_detail %}
 
 {% endblock %}
+
+{% block ngs_bytestream_widget %}
+    {% if size is defined %}<div>Size: {{ size/1024 }} KB</div>{% endif %}
+    {{ block('form_widget_simple') }}
+{% endblock %}

@@ -5,6 +5,8 @@ use NGS\Client\CrudProxy;
 use NGS\Client\DomainProxy;
 use NGS\Client\Exception\InvalidRequestException;
 use NGS\Client\StandardProxy;
+use NGS\Patterns\AggregateRoot;
+use NGS\Patterns\DomainEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
@@ -39,13 +41,19 @@ class CrudController
         $form = $this->createFormBuilder($model)
             ->setAction($app['request']->getUri())
             ->getForm();
-        $form->handleRequest($app['request']);
+        $form->submit($app['request']);
 
         if ($form->isValid()) {
             $item = $form->getData();
-            $crudProxy = new CrudProxy($app['dsl.client']);
             try {
-                $crudProxy->create($item);
+                if ($item instanceof AggregateRoot) {
+                    $crudProxy = new CrudProxy($app['dsl.client']);
+                    $crudProxy->create($item);
+                }
+                elseif ($item instanceof DomainEvent) {
+                    $domainProxy = new DomainProxy($app['dsl.client']);
+                    $domainProxy->submitEvent($item);
+                }
                 return $app->redirect($this->path('ui_grid', array('model' => $model)));
             } catch (InvalidRequestException $e) {
                 throw $e;
@@ -68,9 +76,9 @@ class CrudController
         try {
             $currentItem = $crudProxy->read($modelClass, $uri);
             $form->setData($currentItem);
-            $form->handleRequest($app['request']);
+            $form->submit($app['request']);
         }
-        catch (InvalidArgumentException $ex) {
+        catch (\InvalidArgumentException $ex) {
             $app['logger']->warn($form->getErrorsAsString());
             throw $ex;
         }
@@ -136,6 +144,8 @@ class CrudController
 
         $items = $proxy->search($class, $limit, $paginator->getOffset(), $order);
 
+        $modelType = new $class instanceof AggregateRoot ? 'root' : 'event';
+
         return $app['twig']->render(str_replace('.', '/', $model) . '/grid.twig', [
             'order' => ['field' => $orderField, 'dir' => $orderDir],
             '_is_ajax_request' => $app['request']->isXmlHttpRequest(),
@@ -147,6 +157,7 @@ class CrudController
             'limit' => $paginator->getPerPage(),
             'page_links' => $pageLinks,
             'perpage_links' => $perpageLinks,
+            'model_type' => $modelType,
         ]);
     }
 
@@ -171,6 +182,7 @@ class CrudController
     public function editAction($model, $uri)
     {
         $app = $this->app;
+
         $form = $this->createFormBuilder($model)
             ->setMethod($uri === null ? 'POST' : 'PUT')
             ->setAction($this->path('ui_model_update', array('model' => $model, 'uri' => $uri)))
@@ -181,10 +193,28 @@ class CrudController
         $item = $crudProxy->read($modelClass, $uri);
         $form->setData($item);
 
+        if ($item instanceof DomainEvent)
+            $form->remove('submit');
+
         return $app['twig']->render('model/edit.twig', array(
             'item' => $item,
             'form' => $form->createView(),
             'model' => $model,
+            'can_delete' => !($item instanceof DomainEvent),
+        ));
+    }
+
+    public function downloadAction($model, $uri, $property)
+    {
+        $app = $this->app;
+        $modelClass = $app['dsl']->resolveClass($model);
+        $crudProxy = new CrudProxy($app['dsl.client']);
+        $item = $crudProxy->read($modelClass, $uri);
+
+        return new \Symfony\Component\HttpFoundation\Response($item->$property->value, 200, array(
+            'Content-Type' => 'application/octet-stream',
+            'Content-Length' => $item->$property->size(),
+            'Content-Disposition' => 'attachment; filename="'.$model.'.'.$property.'"',
         ));
     }
 
@@ -196,7 +226,7 @@ class CrudController
         $item = $crudProxy->read($modelClass, $uri);
         try {
             $crudProxy->delete($modelClass, $item->URI);
-        } catch (Exception $ex) {
+        } catch (InvalidRequestException $ex) {
             throw $ex;
         }
         return $app->redirect($this->path('ui_grid', array('model' => $model)));
@@ -214,7 +244,7 @@ class CrudController
             $proxy->delete($items);
             //$app['message']->info('Deleted '.count($items).' "'.$model.'" object(s)');
             return $app->json($uris);
-        } catch (Exception $ex) {
+        } catch (InvalidRequestException $ex) {
             // throw $ex;
             return $app->json($uris, 403);
         }

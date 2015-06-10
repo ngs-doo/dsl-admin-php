@@ -1,5 +1,5 @@
-{% macro button_edit(model, uri) %}
-<a class="btn btn-default btn-sm" href="{{ path('ui_model_edit', {'model': model, 'uri': uri}) }}"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+{% macro button_edit(model, uri, label) %}
+<a class="btn btn-default btn-sm" href="{{ path('ui_model_edit', {'model': model, 'uri': uri}) }}"><span class="glyphicon glyphicon-edit"></span> {{ label ?: 'Edit' }}</a>
 {% endmacro %}
 
 {% macro button_delete(model, uri) %}

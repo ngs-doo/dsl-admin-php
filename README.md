@@ -9,10 +9,10 @@ Add the following to your composer.json and run `composer install`
     {
         "minimum-stability": "dev",
         "require": {
-            "dsl-platform/dsl-admin-php": "dev-master"
+            "dsl-platform/admin": "dev-master"
         },
         "scripts": {
-            "post-install-cmd": "PhpDslAdmin\\Installer::install"
+            "post-install-cmd": "DslPlatform\\Installer::install"
         },
         "autoload": {
             "psr-0": {

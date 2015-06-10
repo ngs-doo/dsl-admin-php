@@ -4,7 +4,10 @@
 
 {% block content %}
 
-{{ form_start(form, {attr: {'class': 'form-horizontal'}}) }}
+{% set form_attr = {class: 'form-horizontal'} %}
+{% if app.form_constraints is not defined or not app.form_constraints %}{% set form_attr = form_attr|merge({novalidate: ''}) %}{% endif %}
+
+{{ form_start(form, {attr: form_attr}) }}
     {{ form_widget(form) }}
 {{ form_end(form) }}
 

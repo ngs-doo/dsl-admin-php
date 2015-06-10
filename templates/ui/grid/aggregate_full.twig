@@ -12,7 +12,7 @@
 <ul class="grid-control list-unstyled list-inline" data-grid="#{{ gridId }}">
 {%  block grid_button_add %}
     <li class="pull-left">
-        <a class="btn btn-default" href="{{ path('ui_model_new', {'model': model}) }}"><span class="glyphicon glyphicon-plus"></span> Add new</a>
+        <a class="btn btn-default" href="{{ path('ui_model_new', {'model': model}) }}"><span class="glyphicon glyphicon-plus"></span> {{ model_type=='event' ? 'Submit new' : 'Add new' }}</a>
     </li>
 {%  endblock grid_button_add %}
 
@@ -50,12 +50,12 @@
                 <td>
                     <input data-target_uri="{{ item.URI }}" class="button-grid-row-select" type="checkbox" />
                     </td><td>
-                    {{ buttons.button_edit(model, item.URI) }}
+                    {{ buttons.button_edit(model, item.URI, model_type == 'event' ? 'View' : 'Edit') }}
                 </td>
                 {% block grid_body_row_fields %}
                 {% endblock grid_body_row_fields %}
                     <td class="grid-buttons">
-                        {{ buttons.button_edit(model, item.URI) }}                        
+                        {{ buttons.button_edit(model, item.URI, model_type == 'event' ? 'View' : 'Edit') }}
                     </td>
                 {% endblock grid_body_row_content %}
             </tr>

@@ -8,7 +8,8 @@
         "silex/silex": "~1.1",
         "silex/web-profiler": "~1.0",
         "dsl-platform/dsl-symfony": "dev-master",
-        "dsl-platform/client": "dev-master"
+        "dsl-platform/client": "dev-master",
+        "dsl-platform/install": "dev-master"
     },
     "autoload": {
         "psr-4": { "": "src/" }

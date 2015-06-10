@@ -17,6 +17,7 @@ class CrudControllerProvider implements \Silex\ControllerProviderInterface
         $crud = $app['controllers_factory'];
         $crud->get('/{model}', 'crud.controller:indexAction')->bind('ui_grid');
         $crud->get('/{model}/', 'crud.controller:addAction')->bind('ui_model_new');
+        $crud->get('/{model}/{property}/download/{uri}', 'crud.controller:downloadAction')->bind('ui_model_download')->assert('uri', '.+');
         $crud->get('/{model}/{uri}', 'crud.controller:editAction')->bind('ui_model_edit')->assert('uri', '.*');
         $crud->post('/{model}', 'crud.controller:createAction')->bind('ui_model_create');
         $crud->put('/{model}/{uri}', 'crud.controller:updateAction')->bind('ui_model_update')->assert('uri', '.+');
